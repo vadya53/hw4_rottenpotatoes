@@ -27,6 +27,11 @@ class MoviesController < ApplicationController
       session[:ratings] = @selected_ratings
       redirect_to :sort => sort, :ratings => @selected_ratings and return
     end
+    
+    if session[:title]
+      flash[:notice] = "'#{session[:title]}' has no director info"
+    end
+    
     @movies = Movie.find_all_by_rating(@selected_ratings.keys, ordering)
   end
 
@@ -58,4 +63,14 @@ class MoviesController < ApplicationController
     redirect_to movies_path
   end
 
+  def similar
+    #assert false, "Not implemented yet"
+    @movie = Movie.find(params[:id])
+    @movie_director = @movie.director
+    @movies = Movie.find_all_by_director(@movie_director, :order => :title)
+    if !@movie_director or @movie_director.eql?("")
+      session[:title] = @movie.title
+      redirect_to movies_path
+    end
+  end
 end
